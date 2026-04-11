@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="rect">STUDENT DATA</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="color: green; font-weight: bold;">
+            {{ message }}
+        </p>
+    {% endfor %}
+{% endif %}
+
+<form method="get" action="">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search name">
+    <button type="submit">Search</button>
+</form>
+
+
+<table class="table table-striped">
+    <tr>
+        <th>S.NO</th>
+        <th>NAME</th>
+        <th>AGE</th>
+        <th>ADDRESS</th>
+        <th>EDIT</th>
+        <th>DELETE</th>
+        <th>IMAGE</tr>
+
+    {% for i in object_list %}
+    <tr>
+        <td>{{ i.id }}</td>
+        <td>{{ i.name }}</td>
+        <td>{{ i.age }}</td>
+        <td>{{ i.address }}</td>
+        <td>
+            <a href="{% url 'edit' i.id %}">Edit</a>
+        </td>
+
+        <td>
+            <form action="{% url 'delete' i.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit"
+                    onclick="return confirm('Are you sure you want to delete?')">
+                    Delete
+                </button>
+            </form>
+        </td>
+        <td>
+    {% if i.image %}
+        <img src="{{ i.image.url }}" width="100">
+    {% endif %}
+</td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+<div>
+    {% if is_paginated %}
+
+        {% if page_obj.has_previous %}
+            <a href="?page=1&q={{ request.GET.q }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}">Previous</a>
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}">Last</a>
+        {% endif %}
+
+    {% endif %}
+</div>
+
+<br>
+
+<a href="{% url 'create' %}">ADD NEW</a>
+
+<br><br>
+
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit"
+        onclick="return confirm('Are you sure you want to logout?')">
+        LOGOUT
+    </button>
+</form>
+
+<img src="{% static 'images/STALIN.jpg' %}" alt="logo">
+
+{% endblock %}
+
